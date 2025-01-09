@@ -1,0 +1,41 @@
+name: Deploy Go Application to S3
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    permissions:
+        id-token: write
+        contents: read
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: 1.21
+
+      - name: Build Go Application
+        run: |
+          go build -o build/devops-playground main.go
+
+      - name: Create Deployment Package
+        run: |
+            scripts/zip.sh
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{vars.AWS_ROLE_ARN}}
+          role-session-name: Github_to_AWS
+          aws-region: us-east-1
+
+      - name: Sync files to S3 bucket
+        run: |
+            aws s3 cp deployment.zip s3:/${{vars.AWS_BUCKET_NAME}}/deployments/deployment.zip
