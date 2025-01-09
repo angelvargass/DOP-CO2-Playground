@@ -28,7 +28,12 @@ jobs:
 
       - name: Create Deployment Package
         run: |
-            scripts/zip.sh
+            mkdir deployment
+            cp -R scripts appspec.yml deployment/
+            mv build/devops-playground deployment/
+            cd deployment
+            zip -r ../deployment.zip .
+            cd ..
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
