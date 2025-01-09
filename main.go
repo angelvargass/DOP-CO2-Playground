@@ -12,7 +12,7 @@ import (
 )
 
 func main() {
-	cfg, err := config.LoadDefaultConfig(context.TODO())
+	cfg, err := config.LoadDefaultConfig(context.TODO(), config.WithDefaultRegion("us-east-1"))
 	if err != nil {
 		log.Fatal(err)
 	}
